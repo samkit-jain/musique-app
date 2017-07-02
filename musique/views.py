@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import render
 import requests
 import json
@@ -73,8 +74,6 @@ def searchTrack(request):
 				matchedSongs.append(item)
 
 	context = {'matchedTracks': matchedSongs}
-
-	print(matchedSongs)
 
 	return render(request, 'musique/search.html', context)
 
