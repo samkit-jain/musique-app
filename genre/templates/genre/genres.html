@@ -1,0 +1,148 @@
+{% load static %}
+
+<head>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+	<link rel="stylesheet" type="text/css" href="{% static 'genre/gindex.css' %}" />
+	<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.4/js.cookie.js"></script>
+	<title>Musique</title>
+	
+	<script type="text/javascript">
+		function validateForm() {
+			var x = document.getElementById("addGen").value.toString().trim();
+			
+			if (x == "") {
+				alert("Empty string");
+				return false;
+			}
+
+			return true;
+		}
+
+		function post(path, params, method) {
+			method = method || "post";
+			var form = document.createElement("form");
+			form.setAttribute("method", method);
+			form.setAttribute("action", path);
+
+			for(var key in params) {
+				if(params.hasOwnProperty(key)) {
+					var hiddenField = document.createElement("input");
+					hiddenField.setAttribute("type", "hidden");
+					hiddenField.setAttribute("name", key);
+					hiddenField.setAttribute("value", params[key]);
+
+					form.appendChild(hiddenField);
+				}
+			}
+
+			var hiddenField1 = document.createElement("input");
+			hiddenField1.setAttribute("type", "hidden");
+			hiddenField1.setAttribute("name", 'csrfmiddlewaretoken');
+			hiddenField1.setAttribute("value", Cookies.get('csrftoken'));
+			form.appendChild(hiddenField1);
+
+			document.body.appendChild(form);
+			form.submit();
+		}
+
+		function validate2(inp, inpid) {
+			post("{% url 'genre:editgenres' %}", {'name': inp.toString().trim(), 'id': inpid});
+		}
+
+		$(document).on('click', '[data-editable]', function() {
+			var $el = $(this);
+			var $id = $el.attr('id');
+			var $input = $('<input/>').val($el.text());
+			$el.replaceWith($input);
+
+			var save = function(){
+				validate2($input.val(), $id);
+			};
+
+			$input.one('blur', save).focus();
+		});
+	</script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
+			<div class="mdl-layout--large-screen-only mdl-layout__header-row">
+			</div>
+			<div class="mdl-layout--large-screen-only mdl-layout__header-row">
+				<h3>Genres</h3>
+			</div>
+			<div class="mdl-layout--large-screen-only mdl-layout__header-row">
+			</div>
+		</header>
+		<main class="mdl-layout__content">
+			<br>
+			<br>
+			<br>
+			<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+				<div style="text-align: center" class="mdl-card mdl-cell mdl-cell--12-col">
+					<br>
+					<br>
+					<form action="{% url 'genre:addgenres' %}" method="post" onsubmit="return validateForm()">
+						{% csrf_token %}
+						<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+							<input class="mdl-textfield__input" type="text" name="name" id="addGen">
+							<label class="mdl-textfield__label" for="addGen">Add genre</label>
+						</div>
+					</form>
+				</div>
+			</section>
+			<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+				<div class="mdl-card mdl-cell mdl-cell--12-col">
+					{% block genresData %}
+						{% for genre in all_genres %}
+							<ul class="demo-list-item mdl-list">
+								<li class="mdl-list__item">
+									<span class="mdl-list__item-primary-content" id="{{ genre.id }}" data-editable>{{ genre.name }}</span>
+								</li>
+							</ul>
+						{% endfor %}
+						<table style="width:100%">
+							<tr>
+								<td align="center">
+									{% if isPrev %}
+										<a href="{% url 'genre:genres' prevNum %}">
+										<button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+											<i class="material-icons">&#xE5C4</i>
+										</button>
+										</a>
+									{% else %}
+										<button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" disabled>
+											<i class="material-icons">&#xE5C4</i>
+										</button>
+									{% endif %}
+								</td>
+								<td align="center">
+									{% if isNext %}
+										<a href="{% url 'genre:genres' nextNum %}">
+										<button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+											<i class="material-icons">&#xE5C8</i>
+										</button>
+										</a>
+									{% else %}
+										<button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" disabled>
+											<i class="material-icons">&#xE5C8</i>
+										</button>
+									{% endif %}
+								</td>
+							</tr>
+						</table>
+						<br>
+						<br>
+					{% endblock %}
+				</div>
+			</section>
+			<br>
+			<br>
+		</main>
+	</div>
+</body>

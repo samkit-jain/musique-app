@@ -1,0 +1,249 @@
+{% load static %}
+
+<head>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+	<link rel="stylesheet" type="text/css" href="{% static 'musique/index.css' %}" />
+	<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+	<title>Musique</title>
+
+	<script type="text/javascript">
+		function validateForm() {
+			var x = document.forms["addTrackForm"]["name"].value.toString().trim();
+			
+			if (x == "") {
+				alert("Invalid name");
+				return false;
+			}
+
+			x = document.forms["addTrackForm"]["rating"].value.toString().trim();
+			x = Number(x);
+
+			if(Number.isNaN(x)) {
+				alert("Invalid rating");
+				return false;
+			} else if(Math.round((x * 10) / 10) <= 0.0 || Math.round((x * 10) / 10) > 10.0) {
+				alert("Range for rating (0.0, 10.0]");
+				return false;
+			}
+
+			document.forms["addTrackForm"]["rating"].value = Math.round((x * 10) / 10);
+
+			x = document.forms["addTrackForm"]["genre"].value.toString().trim();
+
+			return true;
+		}
+	</script>
+	<style>
+		.demo-list-two {
+			width: 100%;
+		}
+
+		body {
+			font-family: 'Roboto', 'Helvetica', sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+
+		.mdl-demo .mdl-layout__header-row {
+			padding-left: 40px;
+		}
+		.mdl-demo .mdl-layout.is-small-screen .mdl-layout__header-row h3 {
+			font-size: inherit;
+		}
+		.mdl-demo main > .mdl-layout__tab-panel {
+			padding: 8px;
+			padding-top: 48px;
+		}
+		.mdl-demo .mdl-card {
+			height: auto;
+			display: flex;
+			flex-direction: column;
+		}
+		.mdl-demo .mdl-card > * {
+			height: auto;
+		}
+		.mdl-demo .mdl-layout__content section:not(:last-of-type) {
+			position: relative;
+			margin-bottom: 48px;
+		}
+		.mdl-demo section.section--center {
+			max-width: 860px;
+		}
+		.mdl-demo section > header{
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		.mdl-demo section > header > .material-icons {
+			font-size: 3rem;
+		}
+		.mdl-demo section > button {
+			position: absolute;
+			z-index: 99;
+			top: 8px;
+			right: 8px;
+		}
+	</style>
+	<!--
+	https://stackoverflow.com/questions/24622132/call-a-dynamic-python-function-after-the-webpage-is-loaded-in-django
+	make genre list load via this
+	-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
+			<div class="mdl-layout--large-screen-only mdl-layout__header-row">
+			</div>
+			<div class="mdl-layout--large-screen-only mdl-layout__header-row">
+				<h3>Tracks</h3>
+			</div>
+			<div class="mdl-layout--large-screen-only mdl-layout__header-row">
+			</div>
+		</header>
+		<main class="mdl-layout__content">
+			<br>
+			<br>
+			<br>
+			<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+				<div style="text-align: center;" class="mdl-card mdl-cell mdl-cell--12-col">
+					<br>
+					<br>
+					<a style="margin-right: 10%" href="{% url 'genre:genres' 1 %}">
+						<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="position:absolute; left=50%">Genres</button>
+					</a>
+					<br>
+					<br>
+					<br>
+					<a style="margin-right: 12%" href="{% url 'musique:addTrackView' %}">
+						<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" style="position:absolute; right=50%">Add Track</button>
+					</a>
+					<br>
+					<br>
+					<br>
+					<form action="{% url 'musique:search' %}">
+						<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+							<input class="mdl-textfield__input" type="text" name="q" id="seaTra">
+							<label class="mdl-textfield__label" for="seaTra">Search track</label>
+						</div>
+					</form>
+					<br>
+				</div>
+			</section>
+
+			<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+				<div class="mdl-card mdl-cell mdl-cell--12-col">
+					{% block tracksData %}
+						<ul class="demo-list-two mdl-list">
+							{% for track in all_tracks %}
+								<li class="mdl-list__item mdl-list__item--two-line">
+									<span class="mdl-list__item-primary-content">
+										<i class="material-icons mdl-list__item-avatar">&#xE405</i>
+										<a href="{% url 'musique:edit' track.id %}">{{ track.title }}</a>
+										<span class="mdl-list__item-sub-title">
+											[
+											{% for genre in track.genres %}
+												{% if forloop.last %}
+													{{ genre.name }}
+												{% else %}
+													{{ genre.name }}, 
+												{% endif %}
+											{% endfor %}
+											]
+										</span>
+									</span>
+								
+									<span class="mdl-list__item-secondary-content">
+										{% if forloop.first %}
+											<span class="mdl-list__item-secondary-info">Rating</span>
+										{% endif %}
+
+										<table>
+											<tr>
+												{% if track.rating == 0 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE83A</i></a></td>
+												{% elif track.rating > 0 and track.rating <= 1 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE839</i></a></td>
+												{% elif track.rating > 1 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE838</i></a></td>
+												{% endif %}
+
+												{% if track.rating <= 2 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE83A</i></a></td>
+												{% elif track.rating > 2 and track.rating <= 3 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE839</i></a></td>
+												{% elif track.rating > 3 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE838</i></a></td>
+												{% endif %}
+
+												{% if track.rating <= 4 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE83A</i></a></td>
+												{% elif track.rating > 4 and track.rating <= 5 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE839</i></a></td>
+												{% elif track.rating > 5 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE838</i></a></td>
+												{% endif %}
+
+												{% if track.rating <= 6 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE83A</i></a></td>
+												{% elif track.rating > 6 and track.rating <= 7 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE839</i></a></td>
+												{% elif track.rating > 7 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE838</i></a></td>
+												{% endif %}
+
+												{% if track.rating <= 8 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE83A</i></a></td>
+												{% elif track.rating > 8 and track.rating <= 9 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE839</i></a></td>
+												{% elif track.rating > 9 %}
+													<td><a class="mdl-list__item-secondary-action"><i class="material-icons">&#xE838</i></a></td>
+												{% endif %}
+											</tr>
+										</table>
+									</span>
+								</li>
+							{% endfor %}
+						</ul>
+						<table style="width:100%">
+							<tr>
+								<td align="center">
+									{% if isPrev %}
+										<a href="?page={{ prevNum }}">
+										<button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+											<i class="material-icons">&#xE5C4</i>
+										</button>
+										</a>
+									{% else %}
+										<button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" disabled>
+											<i class="material-icons">&#xE5C4</i>
+										</button>
+									{% endif %}
+								</td>
+								<td align="center">
+									{% if isNext %}
+										<a href="?page={{ nextNum }}">
+										<button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+											<i class="material-icons">&#xE5C8</i>
+										</button>
+										</a>
+									{% else %}
+										<button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" disabled>
+											<i class="material-icons">&#xE5C8</i>
+										</button>
+									{% endif %}
+								</td>
+							</tr>
+						</table>
+						<br>
+						<br>
+					{% endblock %}
+				</div>
+			</section>
+			<br>
+			<br>
+		</main>
+	</div>
+</body>

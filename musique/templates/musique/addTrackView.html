@@ -1,0 +1,76 @@
+{% load static %}
+
+<head>
+	<title>Musique</title>
+
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+	<link rel="stylesheet" type="text/css" href="{% static 'musique/mod.css' %}" />
+	<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<script type="text/javascript">
+		function validateForm() {
+			var x = document.getElementById("traNam").value.toString().trim();
+			
+			if (x == "") {
+				alert("Empty name");
+				return false;
+			}
+
+			return true;
+		}
+	</script>
+</head>
+
+<body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
+			<div class="mdl-layout--large-screen-only mdl-layout__header-row">
+			</div>
+			<div class="mdl-layout--large-screen-only mdl-layout__header-row">
+				<h3>Add Track</h3>
+			</div>
+			<div class="mdl-layout--large-screen-only mdl-layout__header-row">
+			</div>
+		</header>
+		<main class="mdl-layout__content">
+			<br>
+			<br>
+			<br>
+			<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp">
+				<div style="text-align: center;" class="mdl-card mdl-cell mdl-cell--12-col">
+					<form action="{% url 'musique:add' %}" onsubmit="return validateForm()" method="post">
+						{% csrf_token %}
+						<br>
+						<br>
+						<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+							<input class="mdl-textfield__input" type="text" name="name" id="traNam">
+							<label class="mdl-textfield__label" for="traNam">Track Name</label>
+						</div>
+						<br>
+						<br>
+						<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+							<input class="mdl-textfield__input" type="text" pattern="[0-9]\.[0-9]" name="rating" id="rat" required="true">
+							<label class="mdl-textfield__label" for="rat">Rating</label>
+						</div>
+						<br>
+						<br>
+						<div class="CBcontainer">
+							{% for genre in allGenres %}
+							<label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" for="{{ genre.id }}">
+								<input type="checkbox" id="{{ genre.id }}" value="{{ genre.id }}" class="mdl-checkbox__input" name="genrelist">
+								<span class="mdl-checkbox__label">{{ genre.name }}</span>
+							</label>
+							{% endfor %}
+						</div>
+						<br>
+						<br>
+						<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" type="submit">Submit</button>
+					</form>
+				</div>
+			</section>
+		</main>
+	</div>
+</body>

@@ -1,0 +1,49 @@
+.demo-list-two {
+	width: 100%;
+}
+
+body {
+	font-family: 'Roboto', 'Helvetica', sans-serif;
+	margin: 0;
+	padding: 0;
+}
+
+.mdl-demo .mdl-layout__header-row {
+	padding-left: 40px;
+}
+.mdl-demo .mdl-layout.is-small-screen .mdl-layout__header-row h3 {
+	font-size: inherit;
+}
+.mdl-demo main > .mdl-layout__tab-panel {
+	padding: 8px;
+	padding-top: 48px;
+}
+.mdl-demo .mdl-card {
+	height: auto;
+	display: flex;
+	flex-direction: column;
+}
+.mdl-demo .mdl-card > * {
+	height: auto;
+}
+.mdl-demo .mdl-layout__content section:not(:last-of-type) {
+	position: relative;
+	margin-bottom: 48px;
+}
+.mdl-demo section.section--center {
+	max-width: 860px;
+}
+.mdl-demo section > header{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.mdl-demo section > header > .material-icons {
+	font-size: 3rem;
+}
+.mdl-demo section > button {
+	position: absolute;
+	z-index: 99;
+	top: 8px;
+	right: 8px;
+}
